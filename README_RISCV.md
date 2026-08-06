@@ -1,8 +1,8 @@
 # 在 RISC-V 上运行 OrbbecSDK ROS 2
 
 本仓库已在 RISC-V 64 位主机上使用 ROS 2 Humble 和 Gemini 335 相机完成构建与
-验证。随附的 SDK 二进制文件仅支持 x86_64 和 AArch64，因此 ROS 驱动必须链接到
-原生 RISC-V 版本的 OrbbecSDK。
+验证。仓库已经包含原生 RISC-V 版 OrbbecSDK，克隆或复制整个仓库后可以直接构建，
+不再依赖仓库外的 `/home/bianbu/OrbbecSDK_v2` 目录。
 
 ## 测试环境
 
@@ -11,7 +11,7 @@
 - 固件版本：1.4.60
 - OrbbecSDK / ROS 封装版本：2.9.3
 - 连接方式：USB 2.1
-- 原生 SDK：`/home/bianbu/OrbbecSDK_v2/build_riscv64/install`
+- 内置原生 SDK：`orbbec_camera/SDK/lib/riscv64/`
 
 ## 依赖项
 
@@ -37,11 +37,14 @@ colcon build \
   --parallel-workers 4 \
   --event-handlers console_direct+ \
   --cmake-args \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DORBBEC_SDK_ROOT=/home/bianbu/OrbbecSDK_v2/build_riscv64/install
+    -DCMAKE_BUILD_TYPE=Release
 ```
 
-`ORBBEC_SDK_ROOT` 中必须包含 `include/libobsensor/` 和
+RISC-V 动态库位于 `orbbec_camera/SDK/lib/riscv64/`，构建时会自动选择，并安装到
+`install/orbbec_camera/lib/`。使用上面的 `--symlink-install` 时应分发整个仓库；如需
+单独分发 `install` 目录，请去掉 `--symlink-install` 重新构建，普通安装产物会使用
+相对 RPATH。如需临时使用其他 SDK 版本，仍可传入
+`-DORBBEC_SDK_ROOT=/path/to/install`；该目录中必须包含 `include/libobsensor/` 和
 `lib/libOrbbecSDK.so`。
 
 ## 运行 RGB-D / 视觉惯性 SLAM
